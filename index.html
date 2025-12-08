@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy Birthday, Cyreal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #ffe6ff 0, #f3f7ff 40%, #dfe7ff 100%);
+      padding: 20px;
+    }
+
+    .app-wrapper {
+      max-width: 1100px;
+      width: 100%;
+      max-height: 650px;
+    }
+
+    .window {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow:
+        0 18px 45px rgba(15, 23, 42, 0.18),
+        0 0 0 1px rgba(148, 163, 184, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: floatIn 0.7s ease-out;
+    }
+
+    .title-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, #f97373, #fb923c, #facc15, #4ade80, #60a5fa, #a855f7, #ec4899);
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .title-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      opacity: 0.85;
+    }
+
+    .title-text {
+      font-weight: 600;
+    }
+
+    .content {
+      display: flex;
+      min-height: 420px;
+      max-height: 580px;
+    }
+
+    .sidebar {
+      width: 230px;
+      padding: 16px 10px;
+      border-right: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    .compose-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #c5221f;
+      color: #ffffff;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+    }
+
+    .compose-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #c5221f;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .menu {
+      list-style: none;
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 20px;
+      cursor: default;
+      color: #374151;
+    }
+
+    .menu-item.active {
+      background: #e3edff;
+      font-weight: 600;
+      color: #1d4ed8;
+    }
+
+    .menu-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .search-box {
+      margin-left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      font-size: 13px;
+      color: #9ca3af;
+      min-width: 180px;
+    }
+
+    .search-icon {
+      font-size: 13px;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #4f46e5, #ec4899);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .panels {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .inbox-list {
+      width: 40%;
+      border-right: 1px solid #e5e7eb;
+      background: #ffffff;
+      overflow-y: auto;
+    }
+
+    .email-row {
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 2.5fr) minmax(0, 4fr) auto;
+      gap: 10px;
+      font-size: 14px;
+      align-items: center;
+      cursor: default;
+      border-bottom: 1px solid #f3f4f6;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeSlideUp 0.5s ease-out forwards;
+      animation-delay: 0.4s;
+      background: #f1f5f9;
+    }
+
+    .email-from {
+      font-weight: 600;
+      color: #111827;
+      white-space: nowrap;
+    }
+
+    .email-subject {
+      font-weight: 600;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-snippet {
+      color: #6b7280;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .email-time {
+      font-size: 12px;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #fee2e2;
+      color: #b91c1c;
+      margin-left: 8px;
+    }
+
+    .email-view {
+      flex: 1;
+      padding: 18px 22px;
+      overflow-y: auto;
+      background: #f9fafb;
+      position: relative;
+    }
+
+    .email-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+
+    .email-inner.show {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .subject-line {
+      font-size: 20px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+
+    .meta-row {
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    .meta-row span.label {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .chip-row {
+      margin: 10px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .body-text {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #374151;
+      white-space: pre-line;
+      min-height: 160px;
+    }
+
+    .signature {
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    .signature strong {
+      font-weight: 600;
+    }
+
+    .confetti {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .confetti span {
+      position: absolute;
+      width: 6px;
+      height: 14px;
+      border-radius: 3px;
+      background: #f97316;
+      opacity: 0.7;
+      animation: confettiFall 4s linear infinite;
+    }
+
+    .confetti span:nth-child(2) { left: 12%; background: #ec4899; animation-delay: 0.3s; }
+    .confetti span:nth-child(3) { left: 28%; background: #22c55e; animation-delay: 0.6s; }
+    .confetti span:nth-child(4) { left: 46%; background: #3b82f6; animation-delay: 0.9s; }
+    .confetti span:nth-child(5) { left: 64%; background: #a855f7; animation-delay: 1.2s; }
+    .confetti span:nth-child(6) { left: 82%; background: #f59e0b; animation-delay: 1.5s; }
+
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: #111827;
+      color: #f9fafb;
+      padding: 10px 14px;
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35);
+      font-size: 13px;
+      max-width: 260px;
+      opacity: 0;
+      transform: translateY(-16px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 40;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .toast-text {
+      font-size: 12px;
+      color: #e5e7eb;
+    }
+
+    .music-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #111827;
+      color: #f9fafb;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.35);
+      cursor: pointer;
+      z-index: 30;
+      opacity: 0.95;
+    }
+
+    .music-btn span.icon {
+      font-size: 14px;
+    }
+
+    .music-btn:hover {
+      opacity: 1;
+    }
+
+    /* Click overlay and fake cursor */
+    .click-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5e7eb;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .click-overlay-inner {
+      max-width: 360px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 18px 20px;
+      border-radius: 14px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .overlay-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .overlay-text {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .overlay-hint {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .fake-cursor {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-left: 3px solid #ffffff;
+      border-bottom: 3px solid #ffffff;
+      transform: rotate(-45deg);
+      transform-origin: top left;
+      top: 18%;
+      left: 70%;
+      z-index: 26;
+      animation: cursorMove 1.6s ease-in-out infinite;
+    }
+
+    .fake-cursor::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      top: 12px;
+      left: 12px;
+      opacity: 0;
+      animation: cursorClick 1.6s ease-in-out infinite;
+    }
+
+    @keyframes cursorMove {
+      0% {
+        transform: translate(0, 0) rotate(-45deg);
+      }
+      60% {
+        transform: translate(-180px, 120px) rotate(-45deg);
+      }
+      100% {
+        transform: translate(-180px, 120px) rotate(-45deg);
+      }
+    }
+
+    @keyframes cursorClick {
+      0%, 40% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      60% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.4);
+      }
+    }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: translateY(25px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes fadeSlideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+      }
+      100% {
+        transform: translateY(260px) rotate(260deg);
+      }
+    }
+
+    @media (max-width: 800px) {
+      .content {
+        flex-direction: column;
+      }
+      .sidebar {
+        display: none;
+      }
+      .inbox-list {
+        width: 100%;
+      }
+      .panels {
+        flex-direction: column;
+      }
+      .email-view {
+        min-height: 260px;
+      }
+      .fake-cursor {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgMusic" src="happy-birthday.mp3" preload="auto" loop></audio>
+
+  <div class="toast" id="toast">
+    <div class="toast-title">New message</div>
+    <div class="toast-text">From: Mark</div>
+    <div class="toast-text">To: Cyreal Liwag</div>
+  </div>
+
+  <button class="music-btn" id="musicBtn">
+    <span class="icon">🎵</span>
+    <span id="musicLabel">Play music</span>
+  </button>
+
+  <div class="app-wrapper">
+    <div class="window">
+      <div class="title-bar">
+        <div class="title-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="title-text">Gmail - Happy Birthday, Cyreal</div>
+      </div>
+
+      <div class="content">
+        <aside class="sidebar">
+          <button class="compose-btn">
+            <span class="compose-icon">+</span>
+            Compose
+          </button>
+          <ul class="menu">
+            <li class="menu-item active">
+              <span class="menu-label">
+                <span class="menu-icon">📥</span>
+                <span>Inbox</span>
+              </span>
+              <span>1</span>
+            </li>
+            <li class="menu-item">
+              <span class="menu-label">
+                <span class="menu-icon">⭐</span>
+                <span>Starred</span>
+              </span>
+            </li>
+            <li class="menu-item">
+              <span class="menu-label">
+                <span class="menu-icon">📨</span>
+                <span>Sent</span>
+              </span>
+            </li>
+            <li class="menu-item">
+              <span class="menu-label">
+                <span class="menu-icon">🗑️</span>
+                <span>Trash</span>
+              </span>
+            </li>
+          </ul>
+        </aside>
+
+        <div class="main">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <span>Gmail</span>
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <span>Search mail</span>
+              </div>
+            </div>
+            <div class="toolbar-right">
+              <span>Mark</span>
+              <div class="avatar">M</div>
+            </div>
+          </div>
+
+          <div class="panels">
+            <div class="inbox-list">
+              <div class="email-row">
+                <div class="email-from">Mark</div>
+                <div class="email-subject">
+                  Happy Birthday, Cyreal
+                  <span class="email-snippet">Thank you for being such a bright part of my life...</span>
+                </div>
+                <div class="email-time">
+                  Today
+                  <div class="badge">Birthday</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="email-view">
+              <div class="confetti">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+
+              <!-- Click overlay with animated cursor -->
+              <div class="click-overlay" id="clickOverlay">
+                <div class="click-overlay-inner">
+                  <div class="overlay-title">You have a birthday email</div>
+                  <div class="overlay-text">
+                    Click here to open your message from Mark.
+                  </div>
+                  <div class="overlay-hint">
+                    Tip: Turn up your volume and tap anywhere.
+                  </div>
+                </div>
+                <div class="fake-cursor"></div>
+              </div>
+
+              <div class="email-inner" id="emailInner">
+                <div class="subject-line">Happy Birthday, Cyreal</div>
+
+                <div class="meta-row">
+                  <span class="label">To:</span> Cyreal Liwag
+                </div>
+                <div class="meta-row">
+                  <span class="label">From:</span> Mark
+                </div>
+                <div class="chip-row">
+                  <span class="chip">Birthday</span>
+                  <span class="timestamp">Sent with a lot of love</span>
+                </div>
+
+                <div
+                  class="body-text"
+                  id="emailBody"
+                  data-text="Hi Cyreal, happy birthday.
+
+I just want to greet you and appreciate you today because you really are one of the kindest people I know. You're warm, genuine, and such a good soul. Even though we don't talk all the time or see each other in person, I still consider you a friend.
+
+I've always admired how strong you were before, and it makes me happy to see how your life looks now. It feels lighter, brighter, and honestly, your smiles in your stories always make my day. I hope you get more moments like that this year, syempre more success, more travels, more simple joys.
+
+I've told you before that I wanted to join you at least once, and I'm sorry it never pushed through. Maybe someday we can make it happen. And thank you as well, for being someone who was always easy to talk to. I'm also wishing you and Myree good health.
+
+Back in high school, you were one of the people who truly understood others. You were welcoming, and that's something I still remember. You're a precious person, and I honestly miss hearing your hagalpak laugh. Enjoy your special day, Cyreal.
+
+I couldn't send anything today since we're far apart, and I thought you weren't home yesterday, but I'll make it up to you. Just know I never forgot you, and I never will. People like you stick with me.
+
+Have an amazing birthday, Sissy. 🎂💖">
+                </div>
+
+                <div class="signature">
+                  Warmly,<br />
+                  <strong>Mark</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const music = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+    const musicLabel = document.getElementById("musicLabel");
+    const toast = document.getElementById("toast");
+    const bodyEl = document.getElementById("emailBody");
+    const emailView = document.querySelector(".email-view");
+    const emailInner = document.getElementById("emailInner");
+    const overlay = document.getElementById("clickOverlay");
+
+    let hasStarted = false;
+
+    function startTypewriter() {
+      if (!bodyEl) return;
+      const text = bodyEl.dataset.text || "";
+      let i = 0;
+      bodyEl.textContent = "";
+
+      function typeNext() {
+        if (i <= text.length) {
+          bodyEl.textContent = text.slice(0, i);
+          i += 1;
+
+          if (emailView) {
+            emailView.scrollTop = emailView.scrollHeight;
+          }
+
+          setTimeout(typeNext, 25);
+        }
+      }
+
+      setTimeout(typeNext, 300);
+    }
+
+    window.addEventListener("load", function () {
+      if (toast) {
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 4000);
+      }
+    });
+
+    if (overlay) {
+      overlay.addEventListener("click", () => {
+        if (hasStarted) return;
+        hasStarted = true;
+
+        overlay.style.display = "none";
+
+        if (emailInner) {
+          emailInner.classList.add("show");
+        }
+
+        startTypewriter();
+      });
+    }
+
+    if (musicBtn && music && musicLabel) {
+      musicBtn.addEventListener("click", async () => {
+        try {
+          if (music.paused) {
+            await music.play();
+            musicLabel.textContent = "Pause music";
+          } else {
+            music.pause();
+            musicLabel.textContent = "Play music";
+          }
+        } catch (e) {
+          console.log("Music play blocked or failed", e);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
