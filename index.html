@@ -189,6 +189,29 @@
       .photo-card{flex:0 0 200px;scroll-snap-align:start}
     }
     @media(prefers-reduced-motion:reduce){.scene{transition:opacity .4s ease;transform:none!important}.cfetti{display:none}}
+
+    /* ── STASK: FAST TALK CHALLENGE ── */
+    #stask{display:flex;align-items:center;justify-content:center;overflow-y:auto}
+    .task-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(244,115,33,.08) 0%,transparent 65%),var(--b);pointer-events:none}
+    .task-wrap{position:relative;z-index:1;max-width:520px;width:100%;margin:0 auto;padding:2.5rem 1.5rem 4rem;display:flex;flex-direction:column;align-items:center;gap:1.4rem}
+    .task-header{text-align:center;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+    .task-eye-sm{width:54px;height:54px;filter:drop-shadow(0 0 10px rgba(244,115,33,.7))}
+    .task-subtitle{font-size:.68rem;letter-spacing:.2em;color:var(--g);text-transform:uppercase;font-weight:700}
+    .task-title{font-size:clamp(1.5rem,5vw,2.2rem);color:var(--o);font-weight:900;letter-spacing:-.01em}
+    .task-instruction{font-size:clamp(.83rem,2.2vw,.97rem);color:rgba(245,240,232,.7);text-align:center;line-height:1.75;max-width:440px}
+    .pair-container{width:100%;min-height:180px;position:relative}
+    .ft-pair{background:rgba(255,255,255,.04);border:1px solid rgba(244,115,33,.22);border-radius:14px;padding:1.3rem 1.5rem;opacity:0;transform:translateY(20px) scale(.97);transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1)}
+    .ft-pair--visible{opacity:1;transform:translateY(0) scale(1)}
+    .ft-pair-num{font-size:.62rem;letter-spacing:.18em;color:var(--g);text-transform:uppercase;margin-bottom:.7rem;font-weight:700}
+    .ft-btns{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:center}
+    .ft-btn{flex:1;min-width:120px;padding:.7rem 1rem;background:rgba(244,115,33,.1);border:1.5px solid rgba(244,115,33,.38);border-radius:10px;color:var(--c);font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1)}
+    .ft-btn:hover:not(:disabled){background:rgba(244,115,33,.22);border-color:var(--o);transform:scale(1.05)}
+    .ft-btn:active:not(:disabled){transform:scale(.95)}
+    .ft-btn:disabled{opacity:.4;cursor:default}
+    .ft-btn--chosen{background:var(--o)!important;border-color:var(--o)!important;color:#fff!important;opacity:1!important;box-shadow:0 0 20px rgba(244,115,33,.55)}
+    .ft-or{color:rgba(255,255,255,.3);font-size:.78rem;flex-shrink:0;font-style:italic}
+    .ft-result{margin-top:.9rem;text-align:center;font-size:1.2rem;font-weight:800;color:var(--g);letter-spacing:.05em;opacity:0;transform:scale(.82);transition:opacity .38s ease,transform .38s cubic-bezier(.34,1.56,.64,1)}
+    .ft-result--show{opacity:1;transform:scale(1)}
   </style>
 </head>
 <body>
@@ -282,6 +305,27 @@
   </div>
 </section>
 
+<!-- STASK: FAST TALK CHALLENGE -->
+<section id="stask" class="scene">
+  <div class="task-bg"></div>
+  <div class="task-wrap">
+    <div class="task-header">
+      <svg class="task-eye-sm" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5,50 Q50,5 95,50 Q50,95 5,50 Z" fill="none" stroke="#F47321" stroke-width="3.5"/>
+        <circle cx="50" cy="50" r="22" fill="#001A4E" stroke="#F47321" stroke-width="2"/>
+        <circle cx="50" cy="50" r="11" fill="#F47321"/>
+        <circle cx="44" cy="44" r="3.5" fill="rgba(255,255,255,.65)"/>
+        <circle cx="50" cy="50" r="34" fill="none" stroke="#F47321" stroke-width="1" stroke-dasharray="4 3" opacity=".4"/>
+      </svg>
+      <p class="task-subtitle">Lingguhang Task</p>
+      <h2 class="task-title">Fast Talk Challenge</h2>
+    </div>
+    <p class="task-instruction">Sa Pinoy Big Brother, bago ang mahalagang mensahe, ikaw ay may lingguhang task sa pamamagitan ng Fast Talk Challenge. Piliin nang mabuti ang iyong desisyon.</p>
+    <div id="pairContainer" class="pair-container"></div>
+    <button class="nxt" id="taskNext" style="display:none">Basahin ang mensahe ▶</button>
+  </div>
+</section>
+
 <!-- S5: BIRTHDAY MESSAGE + PHOTOS -->
 <section id="s5" class="scene">
   <div class="cfetti" id="cfetti"></div>
@@ -341,6 +385,7 @@ Happy birthday, Sissy. 🎂💖">
   function onEnter(id) {
     if (id === 's2') kuya();
     if (id === 's4') setTimeout(openEnv, 350);
+    if (id === 'stask') initFastTalk();
     if (id === 's5') { spawnConfetti(); setTimeout(typeMsg, 500); }
   }
 
@@ -406,7 +451,71 @@ Happy birthday, Sissy. 🎂💖">
     document.getElementById('envWrap').classList.add('opening');
     setTimeout(function() { document.getElementById('s4Next').classList.add('show'); }, 2500);
   }
-  document.getElementById('s4Next').addEventListener('click', function() { go('s5'); });
+  document.getElementById('s4Next').addEventListener('click', function() { go('stask'); });
+  document.getElementById('taskNext').addEventListener('click', function() { go('s5'); });
+
+  // STASK: Fast Talk Challenge
+  var ftPairs = [
+    { opts: ['Gelo', 'Donny'],                     result: 'Haliparot.' },
+    { opts: ['Shaun', 'Jeremiah'],                  result: 'Kirindot.' },
+    { opts: ['Inigo', 'Anton'],                     result: 'Cast Out!' },
+    { opts: ['PBB', 'Relationship with the Lord'],  result: 'Congratulations! 🎉' }
+  ];
+  var ftStep = 0;
+
+  function initFastTalk() {
+    ftStep = 0;
+    document.getElementById('pairContainer').innerHTML = '';
+    var tn = document.getElementById('taskNext');
+    tn.style.display = 'none';
+    tn.classList.remove('show');
+    showPair(0);
+  }
+
+  function showPair(idx) {
+    var pair = ftPairs[idx];
+    var pc   = document.getElementById('pairContainer');
+    pc.innerHTML = '';
+    var div = document.createElement('div');
+    div.className = 'ft-pair';
+    div.innerHTML =
+      '<p class="ft-pair-num">Pair ' + (idx + 1) + ' of ' + ftPairs.length + '</p>' +
+      '<div class="ft-btns">' +
+        '<button class="ft-btn">' + pair.opts[0] + '</button>' +
+        '<span class="ft-or">o</span>' +
+        '<button class="ft-btn">' + pair.opts[1] + '</button>' +
+      '</div>' +
+      '<div class="ft-result" id="ftResult"></div>';
+    pc.appendChild(div);
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { div.classList.add('ft-pair--visible'); });
+    });
+    div.querySelectorAll('.ft-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { pickChoice(idx, this, div); });
+    });
+  }
+
+  function pickChoice(idx, btn, div) {
+    var pair = ftPairs[idx];
+    div.querySelectorAll('.ft-btn').forEach(function(b) { b.disabled = true; });
+    btn.classList.add('ft-btn--chosen');
+    var res = document.getElementById('ftResult');
+    res.textContent = pair.result;
+    res.classList.add('ft-result--show');
+    ftStep = idx + 1;
+    if (ftStep < ftPairs.length) {
+      setTimeout(function() {
+        div.classList.remove('ft-pair--visible');
+        setTimeout(function() { showPair(ftStep); }, 460);
+      }, 1300);
+    } else {
+      setTimeout(function() {
+        var tn = document.getElementById('taskNext');
+        tn.style.display = '';
+        requestAnimationFrame(function() { tn.classList.add('show'); });
+      }, 1000);
+    }
+  }
 
   // S5: confetti
   function spawnConfetti() {
